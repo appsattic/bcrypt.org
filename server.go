@@ -2,27 +2,34 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"net/http"
+	"os"
 
-	"golang.org/x/crypto/bcrypt"
+	// "golang.org/x/crypto/bcrypt"
+	"github.com/gorilla/mux"
 )
 
-func checkErr(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello, World!")
 }
 
 func main() {
-	fmt.Println("Hello, World!")
+	// the routers
+	router := mux.NewRouter()
 
-	password := "s3kr1t!"
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
-	checkErr(err)
+	// the handlers
+	router.HandleFunc("/", homeHandler)
+	router.Path("/robots.txt").Handler(http.FileServer(http.Dir("static")))
+	router.Path("/favicon.ico").Handler(http.FileServer(http.Dir("static")))
+	router.PathPrefix("/s/").Handler(http.FileServer(http.Dir("static")))
 
-	cost, err := bcrypt.Cost(hash)
-	checkErr(err)
+	// the server
+	http.Handle("/", router)
 
-	fmt.Printf("Hash=%v\n", string(hash))
-	fmt.Printf("Cost=%v\n", cost)
+	// listen on
+	port := os.Getenv("PORT")
+	if len(port) == 0 {
+		port = "3000"
+	}
+	http.ListenAndServe(":"+port, nil)
 }
