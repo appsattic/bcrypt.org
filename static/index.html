@@ -32,7 +32,7 @@
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
-            <li><a href="/about">About</a></li>
+            <!-- <li><a href="/about">About</a></li> -->
             <li><a href="http://devmonkey.io/">devmonkey.io</a></li>
           </ul>
         </div>
@@ -48,6 +48,7 @@
     </div>
 
     <div class="container">
+
       <div class="row">
         <div class="col-md-8">
           <h2>Generate Hash from Password</h2>
@@ -120,21 +121,84 @@
             </div>
           </form>
         </div>
-        <!--
-        <div class="col-md-4">
-          <h2>API</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div>
-        -->
         <div class="col-md-4">
           <h2>Important!</h2>
           <p>
             Do not type any password that you currently use. This site is for experimentation and testing purposes only.
           </p>
+          <h2>About</h2>
+          <p>
+            This site is brought to you by <a href="http://devmonkey.io/">DevMonkey</a>. We have many other free
+            developer services - all with APIs - so please check them out:
+          </p>
+          <ul>
+            <li><a href="http://cssminifier.com/">CSS Minifier</a></li>
+            <li><a href="http://javascript-minifier.com/">JavaScript Minifier</a></li>
+            <li><a href="http://pngcrush.com/">PNG Crush</a></li>
+            <li><a href="http://jpgoptimiser.com/">JPG Optimiser</a></li>
+            <li><a href="http://img-resize.com/">Image Resize</a></li>
+            <li><a href="http://postb.in/">Post Bin</a></li>
+          </ul>
+          <p>
+              Subscribe to our <a href="http://devmonkey.io/blog/">DevMonkey blog</a> for regular updates and added services.
+          </p>
+          <p>
+              (Ends)
+          </p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
           <h2>API</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+          <p>
+
+<h3>Generate Hash</h3>
+
+<p>Hit this endpoint to generate a hash from a password.</p>
+
+<p>Firstly, set up an environment variable with the password:</p>
+
+<pre><code>$ PASSWORD=super-secret
+</code></pre>
+
+<h4>Curl</h4>
+
+<pre><code>$ curl --verbose --request POST --data "password=$PASSWORD" http://bcrypt.org/api/generate-hash.json
+{"ok":true,"msg":"","password":"super-secret","hash":"$2a$06$q1hUUfwVhEAuxIHLyv9fOukjBUHtZBu7slIAOpwuflmwsquQFBJ.a","cost":6}
+</code></pre>
+
+<h4>Wget</h4>
+
+<pre><code>$ wget --post-data "password=$PASSWORD" http://bcrypt.org/api/generate-hash.json
+$ cat generate-hash.json
+{"ok":true,"msg":"","password":"super-secret","hash":"$2a$06$u91uvrUvSXl3yHJqsPdZdO6HQrIZvfYDHoj6123VYm37b.V5DUdDG","cost":6}
+</code></pre>
+
+<h3>Check Password</h3>
+
+<p>Hit this endpoint to check your hash checks out for your password.</p>
+
+<p>Firstly, set up two environment variables with the password and the hash to check against:</p>
+
+<pre><code>$ PASSWORD=super-secret
+$ HASH='$2a$06$8DhuLEJC5PS8a8XfuvybUOqwLj4ykJ091lyVBF8R9GlYstIfZMjVm'
+</code></pre>
+
+<h4>Curl</h4>
+
+<pre><code>$ curl --verbose --request POST --data "hash=$HASH&password=$PASSWORD" http://bcrypt.org/api/check-password.json
+{"ok":true,"msg":"","password":"super-secret","hash":"$2a$06$8DhuLEJC5PS8a8XfuvybUOqwLj4ykJ091lyVBF8R9GlYstIfZMjVm","cost":6}
+</code></pre>
+
+<h4>Wget</h4>
+
+<pre><code>$ wget --post-data "hash=$HASH&password=$PASSWORD" http://bcrypt.org/api/check-password.json
+$ cat check-password.json
+{"ok":true,"msg":"","password":"super-secret","hash":"$2a$06$8DhuLEJC5PS8a8XfuvybUOqwLj4ykJ091lyVBF8R9GlYstIfZMjVm","cost":6}
+</code></pre>
+
+          </p>
         </div>
       </div>
 

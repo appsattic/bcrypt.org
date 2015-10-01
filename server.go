@@ -1,51 +1,91 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
 	"os"
-	"encoding/json"
 	"strconv"
-	"log"
+	"strings"
 
-	"golang.org/x/crypto/bcrypt"
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type GenerateHash struct {
-	Ok bool `json:"ok"`
-	Msg string `json:"msg"`
+	Ok       bool   `json:"ok"`
+	Msg      string `json:"msg"`
 	Password string `json:"password"`
-	Hash string `json:"hash"`
-	Cost int `json:"cost"`
+	Hash     string `json:"hash"`
+	Cost     int    `json:"cost"`
 }
 
 type CheckPassword struct {
-	Ok bool `json:"ok"`
-	Msg string `json:"msg"`
+	Ok       bool   `json:"ok"`
+	Msg      string `json:"msg"`
 	Password string `json:"password"`
-	Hash string `json:"hash"`
-	Cost int `json:"cost"`
+	Hash     string `json:"hash"`
+	Cost     int    `json:"cost"`
+}
+
+type Err struct {
+	Ok  bool   `json:"ok"`
+	Msg string `json:"msg"`
 }
 
 func checkErr(w http.ResponseWriter, err error) bool {
 	if err != nil {
-		log.Printf("err=%v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return true
 	}
 	return false
 }
 
+func checkErrJson(w http.ResponseWriter, err error) bool {
+	if err != nil {
+		data := Err{
+			false,
+			err.Error(),
+		}
+
+		// send back some JSON
+		json, err := json.Marshal(data)
+		if checkErr(w, err) {
+			return true
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(json)
+		return true
+	}
+	return false
+}
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "static/" + r.URL.Path[1:])
+	http.ServeFile(w, r, "static/"+r.URL.Path[1:])
 }
 
 func apiGenerateHash(w http.ResponseWriter, r *http.Request) {
+	// force the Method to be POST
+	if strings.ToUpper(r.Method) == "POST" {
+		r.Method = "POST"
+	}
+
+	err := r.ParseForm()
+	if checkErr(w, err) {
+		return
+	}
+
 	// get the password and cost
 	password := r.FormValue("password")
 	costStr := r.FormValue("cost")
 
-	var err error
+	// check the password input
+	if len(password) == 0 {
+		// provide a password
+		checkErrJson(w, errors.New("Provide a password"))
+		return
+	}
 
 	// convert cost to an integer
 	cost := 6
@@ -53,14 +93,14 @@ func apiGenerateHash(w http.ResponseWriter, r *http.Request) {
 		cost = 6
 	} else {
 		cost, err = strconv.Atoi(costStr)
-		if checkErr(w, err) {
+		if checkErrJson(w, err) {
 			return
 		}
 	}
 
 	// use bcrypt to hash the password
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
-	if checkErr(w, err) {
+	if checkErrJson(w, err) {
 		return
 	}
 
@@ -75,7 +115,7 @@ func apiGenerateHash(w http.ResponseWriter, r *http.Request) {
 
 	// send back some JSON
 	json, err := json.Marshal(data)
-	if checkErr(w, err) {
+	if checkErrJson(w, err) {
 		return
 	}
 
@@ -102,7 +142,7 @@ func apiCheckPassword(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// see if the password/hash were different or something else entirely
 		if err != bcrypt.ErrMismatchedHashAndPassword {
-			if checkErr(w, err) {
+			if checkErrJson(w, err) {
 				return
 			}
 		}
@@ -116,14 +156,14 @@ func apiCheckPassword(w http.ResponseWriter, r *http.Request) {
 
 	// get the cost of this hash
 	cost, err := bcrypt.Cost([]byte(hash))
-	if checkErr(w, err) {
+	if checkErrJson(w, err) {
 		return
 	}
 	data.Cost = cost
 
 	// send back some JSON
 	json, err := json.Marshal(data)
-	if checkErr(w, err) {
+	if checkErrJson(w, err) {
 		return
 	}
 
