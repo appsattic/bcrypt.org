@@ -179,6 +179,7 @@ func main() {
 	router.HandleFunc("/", homeHandler)
 	router.HandleFunc("/robots.txt", homeHandler)
 	router.HandleFunc("/favicon.ico", homeHandler)
+	router.HandleFunc("/sitemap.txt", homeHandler)
 	router.PathPrefix("/s/").Handler(http.FileServer(http.Dir("static")))
 
 	router.HandleFunc("/api/generate-hash.json", apiGenerateHash)
