@@ -10,6 +10,6 @@ stopwaitsec= 600
 stdout_logfile = /var/log/__NAME__/stdout.log
 stderr_logfile = /var/log/__NAME__/stderr.log
 environment =
-    PORT=__PORT__
+    PORT=__PORT__,
     HOME="/home/chilts",
     USER="chilts"
