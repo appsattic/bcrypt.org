@@ -41,6 +41,7 @@ echo
 
 # restart services
 echo "Restarting services ..."
+sudo systemctl restart caddy.service
 sudo systemctl restart supervisor.service
 echo
 
