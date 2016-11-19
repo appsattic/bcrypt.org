@@ -1,1 +1,1 @@
-http://bcrypt.org/
+https://bcrypt.org/

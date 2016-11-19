@@ -1,18 +1,12 @@
 all:
 
-run:
-	go run server.go
-
 fmt:
-	go fmt server.go
+	find src/ -name '*.go' -exec go fmt {} ';'
 
-get:
-	go get -u golang.org/x/crypto/bcrypt
-	rm -rf src/golang.org/x/crypto/bcrypt/.git
-	go get -u github.com/gorilla/mux
-	rm -rf src/github.com/gorilla/mux/.git
+build: fmt
+	gb build
 
-build:
-	go build server.go
+serve: build
+	PORT=8791 ./bin/server
 
 .PHONY: run fmt clean
